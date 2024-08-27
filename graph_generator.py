@@ -11,7 +11,10 @@ class GraphGenerator:
         # 日本語フォントの設定
         self.font_path = 'C:/Windows/Fonts/meiryo.ttc'  # Meiryoフォントを使用
         self.font_prop = font_manager.FontProperties(fname=self.font_path)
-    
+        # 色のリストを定義
+        self.colors = ['#1f77b4', '#2ca02c', '#ff7f0e', '#9467bd']  # ブルー、グリーン、オレンジ、パープル
+        self.alpha = 0.5  # 透明度
+
     def generate_graph(self, data):
         # 縦軸のデータを抽出
         percentages = data['パーセンテージ']
@@ -21,6 +24,8 @@ class GraphGenerator:
         # グラフのサイズを設定
         fig, ax = plt.subplots(figsize=(12, 8))  # グラフサイズを大きく設定
 
+        color_index = 0  # 色のインデックス
+
         # 各データポイントに対して、テキストを配置
         for percentage, event in zip(percentages, events):
             match = re.match(r"(\d+)-(\d+)", str(percentage))  # 範囲かどうかをチェック
@@ -28,6 +33,12 @@ class GraphGenerator:
                 start, end = map(int, match.groups())
                 position = (1 - (start + end) / 200.0) * len(percentages)  # 範囲の中央位置
                 wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
+
+                # 範囲を塗りつぶす
+                ax.axvspan(0.3, 0.7, ymin=(1 - end / 100.0), ymax=(1 - start / 100.0), 
+                           color=self.colors[color_index % len(self.colors)], alpha=self.alpha)
+                color_index += 1  # 色を次に進める
+
                 ax.text(0.65, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
             else:
                 position = (1 - int(percentage) / 100.0) * len(percentages)  # 単一の数値の場合
