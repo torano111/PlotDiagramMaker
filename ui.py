@@ -14,13 +14,17 @@ class GraphApp:
         self.root.title("グラフ作成アプリ")
         self.root.geometry("600x400")
         
+        # フレームを作成してボタンを配置
+        button_frame = tk.Frame(self.root)
+        button_frame.pack(pady=10)
+
         # インポートボタンの設定
-        self.import_button = tk.Button(self.root, text="CSVをインポート", command=self.import_csv)
-        self.import_button.pack(pady=20)
-        
+        self.import_button = tk.Button(button_frame, text="インポート", command=self.import_csv)
+        self.import_button.grid(row=0, column=0, padx=10)
+
         # エクスポートボタンの設定
-        self.export_button = tk.Button(self.root, text="グラフをエクスポート", command=self.export_graph)
-        self.export_button.pack(pady=20)
+        self.export_button = tk.Button(button_frame, text="エクスポート", command=self.export_graph)
+        self.export_button.grid(row=0, column=1, padx=10)
         
         # キャンバスの初期化
         self.canvas = None
