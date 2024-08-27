@@ -12,7 +12,7 @@ class GraphApp:
         # メインウィンドウの設定
         self.root = tk.Tk()
         self.root.title("グラフ作成アプリ")
-        self.root.geometry("800x600")  # ウィンドウサイズを拡大
+        self.root.geometry("1920x1080")  # ウィンドウサイズを最大に設定
         
         # フレームを作成してボタンを配置
         button_frame = tk.Frame(self.root)
