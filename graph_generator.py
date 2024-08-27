@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
+import textwrap
 
 class GraphGenerator:
     def __init__(self):
@@ -21,7 +22,8 @@ class GraphGenerator:
 
         # 各データポイントに対して、テキストを配置
         for i, (percentage, event) in enumerate(zip(percentages, events)):
-            ax.text(0.5, i, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)
+            wrapped_text = textwrap.fill(event, width=30)  # テキストを30文字で折り返し
+            ax.text(0.5, i, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)
 
         # 縦軸にパーセンテージを設定
         ax.set_yticks(range(len(percentages)))
