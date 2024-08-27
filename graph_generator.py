@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 import textwrap
+import re
 
 class GraphGenerator:
     def __init__(self):
@@ -25,10 +26,18 @@ class GraphGenerator:
 
         # 各データポイントに対して、テキストを配置
         for percentage, event in zip(percentages, events):
-            position = (int(percentage) / 100.0) * len(percentages)  # パーセンテージに基づく位置
+            match = re.match(r"(\d+)-(\d+)", str(percentage))  # 範囲かどうかをチェック
+            if match:
+                start, end = map(int, match.groups())
+                position = (1 - (start + end) / 200.0) * len(percentages)  # 範囲の中央位置
+            else:
+                position = (1 - int(percentage) / 100.0) * len(percentages)  # 単一の数値の場合
+
             wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
             ax.text(0.42, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)
-            ax.text(0.38, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # パーセンテージも表示
+
+            if not match:  # 単一の数値の場合のみパーセンテージを表示
+                ax.text(0.38, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)
 
         # 縦軸にパーセンテージを設定
         ax.set_ylim(0, len(percentages))  # 縦軸の範囲を設定
