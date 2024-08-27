@@ -10,29 +10,33 @@ class GraphGenerator:
         self.font_path = 'C:/Windows/Fonts/meiryo.ttc'  # Meiryoフォントを使用
         self.font_prop = font_manager.FontProperties(fname=self.font_path)
     
-    def generate_graph(self, data, output_path):
+    def generate_graph(self, data):
         # 縦軸のデータを抽出
         percentages = data['パーセンテージ']
         # テキストデータを抽出
         events = data['イベント']
 
         # グラフのサイズを設定
-        plt.figure(figsize=(5, len(percentages) * 0.5))
+        fig, ax = plt.subplots(figsize=(5, len(percentages) * 0.5))
 
         # 各データポイントに対して、テキストを配置
         for i, (percentage, event) in enumerate(zip(percentages, events)):
-            plt.text(0.5, i, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)
+            ax.text(0.5, i, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)
 
         # 縦軸にパーセンテージを設定
-        plt.yticks(range(len(percentages)), percentages, fontproperties=self.font_prop)
+        ax.set_yticks(range(len(percentages)))
+        ax.set_yticklabels(percentages, fontproperties=self.font_prop)
 
         # 軸の表示を削除して、見た目をすっきりさせる
-        plt.xticks([])
-        plt.gca().spines['top'].set_visible(False)
-        plt.gca().spines['right'].set_visible(False)
-        plt.gca().spines['left'].set_visible(False)
-        plt.gca().spines['bottom'].set_visible(False)
+        ax.set_xticks([])
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
 
+        return fig  # フィギュアオブジェクトを返す
+
+    def save_graph(self, fig, output_path):
         # グラフを保存
-        plt.savefig(output_path, bbox_inches='tight')
-        plt.close()
+        fig.savefig(output_path, bbox_inches='tight')
+        plt.close(fig)
