@@ -14,6 +14,15 @@ class GraphGenerator:
         self.colors = ['#1f77b4', '#2ca02c', '#ff7f0e', '#9467bd']  # ブルー、グリーン、オレンジ、パープル
         self.alpha = 0.5  # 透明度
 
+    def calculate_text_width(self, text, fontsize=12):
+        # テキストのx軸方向の長さを計算
+        fig = plt.figure()
+        text_obj = fig.text(0, 0, text, fontsize=fontsize, fontproperties=self.font_prop)
+        renderer = fig.canvas.get_renderer()
+        bbox = text_obj.get_window_extent(renderer=renderer)
+        plt.close(fig)
+        return bbox.width / fig.dpi  # 長さをインチ単位で返す
+
     def generate_graph(self, data):
         # 縦軸のデータを抽出
         percentages = data['パーセンテージ']
@@ -40,19 +49,35 @@ class GraphGenerator:
         sorted_percentages = sorted(percentage_values)
 
         # グラフのサイズを設定
-        fig, ax = plt.subplots(figsize=(12, 8))  # グラフサイズを大きく設定
+        figsize_x = 12
+        fig, ax = plt.subplots(figsize=(figsize_x, 8))  # グラフサイズを大きく設定
 
         color_index = 0  # 色のインデックス
         axis_x = 0.3  # 数直線の横位置
         percentage_x = axis_x - 0.001  # 数直線とパーセンテージの間隔を極小に設定
         event_point_x = axis_x + 0.002  # 数直線と最初のイベントの間隔も極小に設定
-        event_range_x = event_point_x + 0.1
-        right_edge_x = 1.0  # ウィンドウの右端を表すx位置
 
-        # 各データポイントに対して、テキストを配置
+        # 最大テキスト横サイズを計算するための変数
+        max_text_width = 0
+
+        # 1回目のループ：数値のみのイベントテキストを配置し、最大テキスト横サイズを計算
         for percentage, event in zip(percentages, events):
-            match = re.match(r"(\d+)-(\d+)", str(percentage))  # 範囲かどうかをチェック
-            if match:
+            match = re.match(r"(\d+)-(\d+)", str(percentage))
+            if not match:  # 数値のみの場合
+                position = (1 - int(percentage) / 100.0) * len(sorted_percentages)  # 単一の数値の場合
+                ax.text(percentage_x, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
+                ax.text(event_point_x, position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
+                # テキストの横幅を計算して最大値を更新
+                text_width = self.calculate_text_width(event)
+                max_text_width = max(max_text_width, text_width)
+
+        # 2回目のループ：数値-数値のイベントテキストを配置
+        event_range_x = event_point_x + max_text_width / figsize_x  # 最大テキスト横サイズに基づいて調整
+        right_edge_x = max(event_range_x, 1.0)  # ウィンドウの右端を表すx位置
+
+        for percentage, event in zip(percentages, events):
+            match = re.match(r"(\d+)-(\d+)", str(percentage))
+            if match:  # 数値-数値の場合
                 start, end = map(int, match.groups())
                 position = (1 - (start + end) / 200.0) * len(sorted_percentages)  # 範囲の中央位置
 
@@ -61,11 +86,7 @@ class GraphGenerator:
                            color=self.colors[color_index % len(self.colors)], alpha=self.alpha)
                 color_index += 1  # 色を次に進める
 
-                ax.text(event_range_x , position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
-            else:
-                position = (1 - int(percentage) / 100.0) * len(sorted_percentages)  # 単一の数値の場合
-                ax.text(percentage_x, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
-                ax.text(event_point_x, position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
+                ax.text(event_range_x, position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
 
         # 数直線にパーセンテージを表示
         for i, percentage in enumerate(sorted_percentages):
