@@ -17,7 +17,7 @@ class GraphGenerator:
         events = data['イベント']
 
         # グラフのサイズを設定
-        fig, ax = plt.subplots(figsize=(5, len(percentages) * 0.5))
+        fig, ax = plt.subplots(figsize=(7, len(percentages) * 0.5))  # グラフ幅を広げる
 
         # 各データポイントに対して、テキストを配置
         for i, (percentage, event) in enumerate(zip(percentages, events)):
@@ -35,7 +35,7 @@ class GraphGenerator:
         ax.spines['bottom'].set_visible(False)
 
         # マージンを調整して左右が見切れないようにする
-        plt.subplots_adjust(left=0.3, right=0.7)  # 左右のマージンを広く設定
+        plt.subplots_adjust(left=0.3, right=0.85)  # 右側のマージンを調整
 
         return fig  # フィギュアオブジェクトを返す
 

@@ -12,7 +12,7 @@ class GraphApp:
         # メインウィンドウの設定
         self.root = tk.Tk()
         self.root.title("グラフ作成アプリ")
-        self.root.geometry("600x400")
+        self.root.geometry("800x600")  # ウィンドウサイズを拡大
         
         # フレームを作成してボタンを配置
         button_frame = tk.Frame(self.root)
@@ -56,7 +56,7 @@ class GraphApp:
         # キャンバスにグラフを描画
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack(pady=10)
+        self.canvas.get_tk_widget().pack(pady=10, expand=True, fill='both')
 
     def export_graph(self):
         # グラフのエクスポート
