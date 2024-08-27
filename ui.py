@@ -35,9 +35,11 @@ class GraphApp:
         # CSVファイルのインポート
         file_path = filedialog.askopenfilename(filetypes=[("CSVファイル", "*.csv")])
         if file_path:
-            self.data = self.data_handler.load_csv(file_path)
-            self.display_graph()  # グラフを表示するメソッドを呼び出し
-            messagebox.showinfo("成功", "CSVファイルをインポートしました")
+            try:
+                self.data = self.data_handler.load_csv(file_path)
+                self.display_graph()  # グラフを表示するメソッドを呼び出し
+            except Exception as e:
+                messagebox.showwarning("エラー", f"CSVファイルのインポートに失敗しました: {str(e)}")
 
     def display_graph(self):
         # 既存のキャンバスをクリア
@@ -57,8 +59,10 @@ class GraphApp:
         if self.data is not None and self.fig is not None:
             file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNGファイル", "*.png")])
             if file_path:
-                self.graph_generator.save_graph(self.fig, file_path)
-                messagebox.showinfo("成功", "グラフをエクスポートしました")
+                try:
+                    self.graph_generator.save_graph(self.fig, file_path)
+                except Exception as e:
+                    messagebox.showwarning("エラー", f"グラフのエクスポートに失敗しました: {str(e)}")
         else:
             messagebox.showwarning("エラー", "まずCSVファイルをインポートしてください")
 
