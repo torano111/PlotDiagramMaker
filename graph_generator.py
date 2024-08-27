@@ -13,9 +13,9 @@ class GraphGenerator:
     
     def generate_graph(self, data):
         # 縦軸のデータを抽出
-        percentages = data['パーセンテージ']
+        percentages = data['パーセンテージ'][::-1]  # データを逆順にする
         # テキストデータを抽出
-        events = data['イベント']
+        events = data['イベント'][::-1]  # テキストも逆順にする
 
         # グラフのサイズを設定
         fig, ax = plt.subplots(figsize=(7, len(percentages) * 0.5))  # グラフ幅を広げる
