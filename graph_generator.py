@@ -21,6 +21,25 @@ class GraphGenerator:
         # テキストデータを抽出
         events = data['イベント']
 
+        # 表示するパーセンテージの値を集める
+        percentage_values = set()
+
+        for percentage in percentages:
+            match = re.match(r"(\d+)-(\d+)", str(percentage))
+            if match:
+                start, end = map(int, match.groups())
+                percentage_values.add(start)
+                percentage_values.add(end)
+            else:
+                percentage_values.add(int(percentage))
+
+        # 0% と 100% を必ず追加
+        percentage_values.add(0)
+        percentage_values.add(100)
+
+        # パーセンテージをソートしてリストに変換
+        sorted_percentages = sorted(percentage_values)
+
         # グラフのサイズを設定
         fig, ax = plt.subplots(figsize=(12, 8))  # グラフサイズを大きく設定
 
@@ -31,7 +50,7 @@ class GraphGenerator:
             match = re.match(r"(\d+)-(\d+)", str(percentage))  # 範囲かどうかをチェック
             if match:
                 start, end = map(int, match.groups())
-                position = (1 - (start + end) / 200.0) * len(percentages)  # 範囲の中央位置
+                position = (1 - (start + end) / 200.0) * len(sorted_percentages)  # 範囲の中央位置
                 wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
 
                 # 範囲を塗りつぶす
@@ -41,16 +60,21 @@ class GraphGenerator:
 
                 ax.text(0.65, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
             else:
-                position = (1 - int(percentage) / 100.0) * len(percentages)  # 単一の数値の場合
+                position = (1 - int(percentage) / 100.0) * len(sorted_percentages)  # 単一の数値の場合
                 wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
                 ax.text(0.25, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
                 ax.text(0.35, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
+
+        # 数直線にパーセンテージを表示
+        for i, percentage in enumerate(sorted_percentages):
+            position = (1 - percentage / 100.0) * len(sorted_percentages)
+            ax.text(0.25, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)
 
         # 縦軸に数直線を描画
         ax.axvline(x=0.3, color='black', linewidth=1)  # 数直線を描画
 
         # 縦軸の範囲を設定
-        ax.set_ylim(0, len(percentages))  
+        ax.set_ylim(0, len(sorted_percentages))  
 
         # 軸の表示を削除して、見た目をすっきりさせる
         ax.set_xticks([])
