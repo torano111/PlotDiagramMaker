@@ -34,6 +34,9 @@ class GraphGenerator:
         ax.spines['left'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
 
+        # マージンを調整して左右が見切れないようにする
+        plt.subplots_adjust(left=0.3, right=0.7)  # 左右のマージンを広く設定
+
         return fig  # フィギュアオブジェクトを返す
 
     def save_graph(self, fig, output_path):
