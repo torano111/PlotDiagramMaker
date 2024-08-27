@@ -3,7 +3,6 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-import textwrap
 import re
 
 class GraphGenerator:
@@ -44,6 +43,11 @@ class GraphGenerator:
         fig, ax = plt.subplots(figsize=(12, 8))  # グラフサイズを大きく設定
 
         color_index = 0  # 色のインデックス
+        axis_x = 0.3  # 数直線の横位置
+        percentage_x = axis_x - 0.001  # 数直線とパーセンテージの間隔を極小に設定
+        event_point_x = axis_x + 0.002  # 数直線と最初のイベントの間隔も極小に設定
+        event_range_x = event_point_x + 0.1
+        right_edge_x = 1.0  # ウィンドウの右端を表すx位置
 
         # 各データポイントに対して、テキストを配置
         for percentage, event in zip(percentages, events):
@@ -51,27 +55,25 @@ class GraphGenerator:
             if match:
                 start, end = map(int, match.groups())
                 position = (1 - (start + end) / 200.0) * len(sorted_percentages)  # 範囲の中央位置
-                wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
 
-                # 範囲を塗りつぶす
-                ax.axvspan(0.3, 0.7, ymin=(1 - end / 100.0), ymax=(1 - start / 100.0), 
+                # 範囲を塗りつぶす（右端をウィンドウの右端に固定）
+                ax.axvspan(axis_x, right_edge_x, ymin=(1 - end / 100.0), ymax=(1 - start / 100.0), 
                            color=self.colors[color_index % len(self.colors)], alpha=self.alpha)
                 color_index += 1  # 色を次に進める
 
-                ax.text(0.65, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
+                ax.text(event_range_x , position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
             else:
                 position = (1 - int(percentage) / 100.0) * len(sorted_percentages)  # 単一の数値の場合
-                wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
-                ax.text(0.25, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
-                ax.text(0.35, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
+                ax.text(percentage_x, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
+                ax.text(event_point_x, position, event, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
 
         # 数直線にパーセンテージを表示
         for i, percentage in enumerate(sorted_percentages):
             position = (1 - percentage / 100.0) * len(sorted_percentages)
-            ax.text(0.25, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)
+            ax.text(percentage_x, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)
 
         # 縦軸に数直線を描画
-        ax.axvline(x=0.3, color='black', linewidth=1)  # 数直線を描画
+        ax.axvline(x=axis_x, color='black', linewidth=1)  # 数直線を描画
 
         # 縦軸の範囲を設定
         ax.set_ylim(0, len(sorted_percentages))  
