@@ -21,9 +21,6 @@ class GraphGenerator:
         # グラフのサイズを設定
         fig, ax = plt.subplots(figsize=(12, 8))  # グラフサイズを大きく設定
 
-        # 縦軸に数直線を描画
-        ax.axvline(x=0.3, color='black', linewidth=1)  # 数直線を描画
-
         # 各データポイントに対して、テキストを配置
         for percentage, event in zip(percentages, events):
             match = re.match(r"(\d+)-(\d+)", str(percentage))  # 範囲かどうかをチェック
@@ -31,15 +28,18 @@ class GraphGenerator:
                 start, end = map(int, match.groups())
                 position = (1 - (start + end) / 200.0) * len(percentages)  # 範囲の中央位置
                 wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
-                ax.text(0.75, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
+                ax.text(0.65, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 最右側に表示
             else:
                 position = (1 - int(percentage) / 100.0) * len(percentages)  # 単一の数値の場合
                 wrapped_text = textwrap.fill(event, width=25)  # テキストを25文字で折り返し
-                ax.text(0.35, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
-                ax.text(0.45, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
+                ax.text(0.25, position, f'{percentage}%', ha='right', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の左側にパーセンテージ表示
+                ax.text(0.35, position, wrapped_text, ha='left', va='center', fontsize=12, fontproperties=self.font_prop)  # 数直線の右側にイベント表示
 
-        # 縦軸にパーセンテージを設定
-        ax.set_ylim(0, len(percentages))  # 縦軸の範囲を設定
+        # 縦軸に数直線を描画
+        ax.axvline(x=0.3, color='black', linewidth=1)  # 数直線を描画
+
+        # 縦軸の範囲を設定
+        ax.set_ylim(0, len(percentages))  
 
         # 軸の表示を削除して、見た目をすっきりさせる
         ax.set_xticks([])
